@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "../index.css";
 import axios from "axios";
-import * as qs from "query-string"
+import * as qs from "query-string";
 export default class UserInfo extends Component {
   constructor(props) {
     super(props);
@@ -12,24 +12,22 @@ export default class UserInfo extends Component {
         redirect_uri: "",
         scope: "",
         client_id: "",
-        client_secret: ''
+        client_secret: ""
       },
-      accessToken: ''
+      accessToken: ""
     };
   }
-    componentWillMount() {
-   
-  }
+  componentWillMount() {}
 
   componentDidMount() {
     axios
-      .post("http://localhost:5000/get_app_info")
+      .post("http://localhost:4000/get_app_info")
       .then(res => res.data)
       .then(res => this.setState({ data: res }))
       .then(() => {
         const code = qs.parse(window.location.search);
         console.log(code);
-        console.log(this.state.data)
+        console.log(this.state.data);
         this.setState({ code: code.code });
         axios
           .post("http://localhost:3000/oauth/get_access_token", {
@@ -44,13 +42,12 @@ export default class UserInfo extends Component {
           .then(() => {
             console.log(this.state.accessToken);
             axios
-              .post("http://localhost:3000/api/info/get_user_info",{
+              .post("http://localhost:3000/api/info/get_user_info", {
                 Authorizaion: `Bearer ${this.state.accessToken}`
               })
               .then(data => console.log(data));
           });
-      })
-    
+      });
   }
   render() {
     return (
