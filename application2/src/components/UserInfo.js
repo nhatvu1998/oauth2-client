@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "../index.css";
 import axios from "axios";
-import * as qs from "query-string"
+import * as qs from "query-string";
 export default class UserInfo extends Component {
   constructor(props) {
     super(props);
@@ -12,14 +12,12 @@ export default class UserInfo extends Component {
         redirect_uri: "",
         scope: "",
         client_id: "",
-        client_secret: ''
+        client_secret: ""
       },
-      accessToken: ''
+      accessToken: "", user: {}, show: false
     };
   }
-    componentWillMount() {
-   
-  }
+  componentWillMount() {}
 
   componentDidMount() {
     axios
@@ -29,7 +27,7 @@ export default class UserInfo extends Component {
       .then(() => {
         const code = qs.parse(window.location.search);
         console.log(code);
-        console.log(this.state.data)
+        console.log(this.state.data);
         this.setState({ code: code.code });
         axios
           .post("http://localhost:3000/oauth/get_access_token", {
@@ -39,28 +37,49 @@ export default class UserInfo extends Component {
             redirect_uri: this.state.data.redirect_uri,
             code: this.state.code
           })
-          .then(res => res.data)
-          .then(data => this.setState({ accessToken: data.accessToken }))
+          .then(data => {
+            this.setState({accessToken: data.accessToken})
+          })
           .then(() => {
-            console.log(this.state.accessToken);
             axios
-              .post("http://localhost:3000/api/info/get_user_info",{
-                Authorizaion: `Bearer ${this.state.accessToken}`
+              .get("http://localhost:3000/api/info/get_user_info", {
+                headers: {
+                  Authorization: "Bearer " + this.state.accessToken
+                }
               })
-              .then(data => console.log(data));
+              .then(res => {
+                this.setState({user: res.data});
+                this.setState({show: true});
+                console.log(this.state.user);
+              });
           });
-      })
-    
+      });
   }
   render() {
+    // if (this.show) {
+    //     return (
+    //         <div className="box">
+    //         <div class="card">
+    //         <div className="card-body">
+    //         <h4 class="card-title">{this.user.username}</h4>
+    //         <hr />
+    //         <p class="card-text">Name: {this.user.name}</p>
+    //     <p class="card-text">Age: {this.user.age}</p>
+    //     <p class="card-text">Email: {this.user.email}</p>
+    //     </div>
+    //     </div>
+    //     </div>
+    // );
+    // } else return null;
     return (
       <div className="box">
         <div class="card">
           <div className="card-body">
-            <h4 class="card-title"></h4>
+            <h4 class="card-title">{this.state.user.username}</h4>
             <hr />
-            <p class="card-text">Age: 22</p>
-            <p class="card-text">Email: abc@gmail.com</p>
+            <p class="card-text">Name: {this.state.user.name}</p>
+            <p class="card-text">Age: {this.state.user.age}</p>
+            <p class="card-text">Email: {this.state.user.email}</p>
           </div>
         </div>
       </div>
