@@ -14,14 +14,14 @@ export default class UserInfo extends Component {
         client_id: "",
         client_secret: ""
       },
-      accessToken: "", user: {}, show: false
+      accessToken: ""
     };
   }
   componentWillMount() {}
 
   componentDidMount() {
     axios
-      .post("http://localhost:5000/get_app_info")
+      .post("http://localhost:4000/get_app_info")
       .then(res => res.data)
       .then(res => this.setState({ data: res }))
       .then(() => {
@@ -37,49 +37,27 @@ export default class UserInfo extends Component {
             redirect_uri: this.state.data.redirect_uri,
             code: this.state.code
           })
-          .then(data => {
-            this.setState({accessToken: data.accessToken})
-          })
+          .then(res => res.data)
+          .then(data => this.setState({ accessToken: data.accessToken }))
           .then(() => {
+            console.log(this.state.accessToken);
             axios
-              .get("http://localhost:3000/api/info/get_user_info", {
-                headers: {
-                  Authorization: "Bearer " + this.state.accessToken
-                }
+              .post("http://localhost:3000/api/info/get_user_info", {
+                Authorizaion: `Bearer ${this.state.accessToken}`
               })
-              .then(res => {
-                this.setState({user: res.data});
-                this.setState({show: true});
-                console.log(this.state.user);
-              });
+              .then(data => console.log(data));
           });
       });
   }
   render() {
-    // if (this.show) {
-    //     return (
-    //         <div className="box">
-    //         <div class="card">
-    //         <div className="card-body">
-    //         <h4 class="card-title">{this.user.username}</h4>
-    //         <hr />
-    //         <p class="card-text">Name: {this.user.name}</p>
-    //     <p class="card-text">Age: {this.user.age}</p>
-    //     <p class="card-text">Email: {this.user.email}</p>
-    //     </div>
-    //     </div>
-    //     </div>
-    // );
-    // } else return null;
     return (
       <div className="box">
         <div class="card">
           <div className="card-body">
-            <h4 class="card-title">{this.state.user.username}</h4>
+            <h4 class="card-title"></h4>
             <hr />
-            <p class="card-text">Name: {this.state.user.name}</p>
-            <p class="card-text">Age: {this.state.user.age}</p>
-            <p class="card-text">Email: {this.state.user.email}</p>
+            <p class="card-text">Age: 22</p>
+            <p class="card-text">Email: abc@gmail.com</p>
           </div>
         </div>
       </div>
